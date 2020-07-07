@@ -4,7 +4,7 @@ import re
 import time
 
 # open browser and print video title
-driver = webdriver.Chrome("/Users/prakky/Desktop/DataSCIENCE/Git_proj/Youtube_Scrapper/chromedriver")
+driver = webdriver.Chrome("/Users/prakky/Desktop/DataSCIENCE/Git_proj/Youtube_Scrapper/drafts/chromedriver")
 driver.get("https://www.youtube.com/watch?v=ZtTt822bDNE")
 time.sleep(2)
 title = driver.find_element_by_xpath('//*[@id="container"]/h1/yt-formatted-string').text
