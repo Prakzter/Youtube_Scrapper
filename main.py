@@ -5,21 +5,46 @@ import time
 driver = webdriver.Chrome("/Users/prakky/Desktop/DataSCIENCE/Git_proj/Youtube_Scrapper/drafts/chromedriver")
 
 
+# extracting video Urls from a Channel
+channel_url = "https://www.youtube.com/user/b7bb7/videos"
+driver.get(channel_url)
+
+# page loading to retrieve all videos
+last_height = driver.execute_script("return document.documentElement.scrollHeight")
+while True:
+    # Scroll down to bottom
+    driver.execute_script("window.scrollTo(0, document.documentElement.scrollHeight);")
+
+    # Wait to load page
+    time.sleep(3)
+
+    # Calculate new scroll height and compare with last scroll height
+    new_height = driver.execute_script("return document.documentElement.scrollHeight")
+    if new_height == last_height:
+        break
+    last_height = new_height
+
+driver.execute_script("window.scrollTo(0, document.documentElement.scrollHeight);")
+time.sleep(2)  
+
+elems = driver.find_elements_by_xpath('//*[@id="video-title"]')
+for link in elems:
+    print(link.get_attribute("href"))
+print(len(elems))
 
 # open browser and print video title
-
 url = "https://www.youtube.com/watch?v=ZtTt822bDNE"
 driver.get(url)
 time.sleep(2)
 vid_title = driver.find_element_by_xpath('//*[@id="container"]/h1/yt-formatted-string').text
 vid_id = url.split("https://www.youtube.com/watch?v=")[1]
-print("\n\n")
+print("\n")
 print("------------------------------------------------------------------------------------")
 
 # page loading to retrieve all comments
 comment_section = driver.find_element_by_xpath('//*[@id="comments"]')
 driver.execute_script("arguments[0].scrollIntoView();", comment_section)
-time.sleep(2)
+time.sleep(1)
 
 last_height = driver.execute_script("return document.documentElement.scrollHeight")
 while True:
@@ -55,7 +80,12 @@ df["Video_Id"] = vid_id
 print(df)
 
 
+
+# end program
 driver.close()
+
+
+
 
 
 
