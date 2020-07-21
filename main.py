@@ -2,13 +2,18 @@ import pandas as pd
 from selenium import webdriver
 import re
 import time
+driver = webdriver.Chrome("/Users/prakky/Desktop/DataSCIENCE/Git_proj/Youtube_Scrapper/drafts/chromedriver")
+
+
 
 # open browser and print video title
-driver = webdriver.Chrome("/Users/prakky/Desktop/DataSCIENCE/Git_proj/Youtube_Scrapper/drafts/chromedriver")
-driver.get("https://www.youtube.com/watch?v=ZtTt822bDNE")
+
+url = "https://www.youtube.com/watch?v=ZtTt822bDNE"
+driver.get(url)
 time.sleep(2)
-title = driver.find_element_by_xpath('//*[@id="container"]/h1/yt-formatted-string').text
-print("Video Title: " + title)
+vid_title = driver.find_element_by_xpath('//*[@id="container"]/h1/yt-formatted-string').text
+vid_id = url.split("https://www.youtube.com/watch?v=")[1]
+print("\n\n")
 print("------------------------------------------------------------------------------------")
 
 # page loading to retrieve all comments
@@ -34,20 +39,22 @@ driver.execute_script("window.scrollTo(0, document.documentElement.scrollHeight)
   
 
 
-# printing out comments
+# extracting comments (not comment replies) to dataframe
 name_elems=driver.find_elements_by_xpath('//*[@id="author-text"]')
 comment_elems = driver.find_elements_by_xpath('//*[@id="content-text"]')
 num_of_names = len(name_elems)
+full_list = {}
 for i in range(num_of_names):
     username = name_elems[i].text 
-    
-    
     comment = comment_elems[i].text  
-        
-    print(username + ": " + comment) 
-    print("-------------------------------------------")
+    full_list[username] = comment
 
-print(str(num_of_names) + " comments in total")
+
+df = pd.DataFrame(list(full_list.items()),columns = ['Username','Comment'])
+df["Video_title"] = vid_title
+df["Video_Id"] = vid_id
+print(df)
+
 
 driver.close()
 
