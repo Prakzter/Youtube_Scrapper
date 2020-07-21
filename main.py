@@ -49,7 +49,6 @@ for i in range(num_of_names):
     comment = comment_elems[i].text  
     full_list[username] = comment
 
-
 df = pd.DataFrame(list(full_list.items()),columns = ['Username','Comment'])
 df["Video_title"] = vid_title
 df["Video_Id"] = vid_id
