@@ -88,7 +88,7 @@ def get_video_comments(url):
     dataf["Video_title"] = vid_title
     dataf["Video_Id"] = vid_id
 
-    filename = "YTS_" + str(vid_id)
+    filename = "YTS_" + str(vid_title)
     dataf.to_csv(filename+".csv")
     # return dataf
     del dataf
