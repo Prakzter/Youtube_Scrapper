@@ -5,8 +5,12 @@ import time
 driver = webdriver.Chrome("/Users/prakky/Desktop/DataSCIENCE/Git_proj/Youtube_Scrapper/drafts/chromedriver")
 
 
+# sample channel_url = "https://www.youtube.com/c/DataProfessor/videos"
+# sample single_url = "https://www.youtube.com/watch?v=ZtTt822bDNE"
+
 # extracting video Urls from a Channel
-channel_url = "https://www.youtube.com/user/b7bb7/videos"
+channel_url = input("Link to Youtube Channel (Videos page): ")
+print("\n")
 driver.get(channel_url)
 
 # page loading to retrieve all videos
@@ -25,69 +29,87 @@ while True:
     last_height = new_height
 
 driver.execute_script("window.scrollTo(0, document.documentElement.scrollHeight);")
-time.sleep(2)  
 
+#put the urls in the list
+video_url_list = []
 elems = driver.find_elements_by_xpath('//*[@id="video-title"]')
 for link in elems:
-    print(link.get_attribute("href"))
-print(len(elems))
+    each_link = link.get_attribute("href")
+    video_url_list.append(each_link)
 
-# open browser and print video title
-url = "https://www.youtube.com/watch?v=ZtTt822bDNE"
-driver.get(url)
-time.sleep(2)
-vid_title = driver.find_element_by_xpath('//*[@id="container"]/h1/yt-formatted-string').text
-vid_id = url.split("https://www.youtube.com/watch?v=")[1]
-print("\n")
-print("------------------------------------------------------------------------------------")
+print(len(video_url_list))
 
-# page loading to retrieve all comments
-comment_section = driver.find_element_by_xpath('//*[@id="comments"]')
-driver.execute_script("arguments[0].scrollIntoView();", comment_section)
-time.sleep(1)
 
-last_height = driver.execute_script("return document.documentElement.scrollHeight")
-while True:
-    # Scroll down to bottom
+# function to extract comments from a single video
+def get_video_comments(url):
+
+    driver.get(url)
+    time.sleep(2)
+    vid_title = driver.find_element_by_xpath('//*[@id="container"]/h1/yt-formatted-string').text
+    vid_id = url.split("https://www.youtube.com/watch?v=")[1]
+    print("\n")
+    print("------------------------------------------------------------------------------------")
+
+    # page loading to retrieve all comments
+    comment_section = driver.find_element_by_xpath('//*[@id="comments"]')
+    driver.execute_script("arguments[0].scrollIntoView();", comment_section)
+    time.sleep(1)
+
+    last_height = driver.execute_script("return document.documentElement.scrollHeight")
+    while True:
+        # Scroll down to bottom
+        driver.execute_script("window.scrollTo(0, document.documentElement.scrollHeight);")
+
+        # Wait to load page
+        time.sleep(3)
+
+        # Calculate new scroll height and compare with last scroll height
+        new_height = driver.execute_script("return document.documentElement.scrollHeight")
+        if new_height == last_height:
+            break
+        last_height = new_height
+
     driver.execute_script("window.scrollTo(0, document.documentElement.scrollHeight);")
+    
 
-    # Wait to load page
-    time.sleep(3)
+    # extracting comments (not comment replies) to dataframe
+    name_elems=driver.find_elements_by_xpath('//*[@id="author-text"]')
+    comment_elems = driver.find_elements_by_xpath('//*[@id="content-text"]')
+    num_of_names = len(name_elems)
+    full_list = {}
+    for i in range(num_of_names):
+        username = name_elems[i].text 
+        comment = comment_elems[i].text  
+        full_list[username] = comment
 
-    # Calculate new scroll height and compare with last scroll height
-    new_height = driver.execute_script("return document.documentElement.scrollHeight")
-    if new_height == last_height:
-        break
-    last_height = new_height
+    dataf = pd.DataFrame(columns = ['Username','Comment',"Video_title","Video_Id"])
+    dataf["Username"] = full_list.keys()
+    dataf["Comment"] =  full_list.values()
+    dataf["Video_title"] = vid_title
+    dataf["Video_Id"] = vid_id
 
-driver.execute_script("window.scrollTo(0, document.documentElement.scrollHeight);")
+    return dataf
+    del dataf
+    del full_list
+    
+
   
 
-
-# extracting comments (not comment replies) to dataframe
-name_elems=driver.find_elements_by_xpath('//*[@id="author-text"]')
-comment_elems = driver.find_elements_by_xpath('//*[@id="content-text"]')
-num_of_names = len(name_elems)
-full_list = {}
-for i in range(num_of_names):
-    username = name_elems[i].text 
-    comment = comment_elems[i].text  
-    full_list[username] = comment
-
-df = pd.DataFrame(list(full_list.items()),columns = ['Username','Comment'])
-df["Video_title"] = vid_title
-df["Video_Id"] = vid_id
-print(df)
+for link in video_url_list[:2]:
+    # dataf = pd.DataFrame(columns = ['Username','Comment',"Video_title","Video_Id"])
+    print(get_video_comments(link))
+    
+    
 
 
 
-# end program
+
+
+
+
+
+# end webdriver
 driver.close()
-
-
-
-
-
 
 
 
@@ -117,5 +139,3 @@ driver.close()
 #                                "]+", flags=re.UNICODE)
 #     return emoji_pattern.sub(r'', string)
 
-# yt_link = input("Link to Youtube video: ")
-# print("-------------------------------------------------------------------------------")
