@@ -97,7 +97,7 @@ def get_video_comments(url):
 
   
 
-for link in video_url_list[:2]:
+for link in video_url_list:
     get_video_comments(link)
 print(f"{len(video_url_list)} csv files have been created. Please check the directory of the main python file.")
     
