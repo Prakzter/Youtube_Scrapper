@@ -48,7 +48,7 @@ def get_video_comments(url):
     vid_title = driver.find_element_by_xpath('//*[@id="container"]/h1/yt-formatted-string').text
     vid_id = url.split("https://www.youtube.com/watch?v=")[1]
     print("\n")
-    print("------------------------------------------------------------------------------------")
+    print(f"Loading video_ID {url} now")
 
     # page loading to retrieve all comments
     comment_section = driver.find_element_by_xpath('//*[@id="comments"]')
@@ -88,7 +88,9 @@ def get_video_comments(url):
     dataf["Video_title"] = vid_title
     dataf["Video_Id"] = vid_id
 
-    return dataf
+    filename = "YTS_" + str(vid_id)
+    dataf.to_csv(filename+".csv")
+    # return dataf
     del dataf
     del full_list
     
@@ -96,17 +98,10 @@ def get_video_comments(url):
   
 
 for link in video_url_list[:2]:
-    # dataf = pd.DataFrame(columns = ['Username','Comment',"Video_title","Video_Id"])
-    print(get_video_comments(link))
+    get_video_comments(link)
+print(f"{len(video_url_list)} csv files have been created. Please check the directory of the main python file.")
     
-    
-
-
-
-
-
-
-
+  
 
 # end webdriver
 driver.close()
