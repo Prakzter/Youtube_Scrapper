@@ -1,4 +1,5 @@
 import pandas as pd
+import os
 from selenium import webdriver
 import re
 import time
@@ -37,8 +38,9 @@ for link in elems:
     each_link = link.get_attribute("href")
     video_url_list.append(each_link)
 
-print(len(video_url_list))
-
+print(f"{len(video_url_list)} videos found in the Youtube Channel\nScanning videos now")
+current_path = os.getcwd()
+filepath = os.mkdir(current_path + "/scrapped")
 
 # function to extract comments from a single video
 def get_video_comments(url):
@@ -48,7 +50,7 @@ def get_video_comments(url):
     vid_title = driver.find_element_by_xpath('//*[@id="container"]/h1/yt-formatted-string').text
     vid_id = url.split("https://www.youtube.com/watch?v=")[1]
     print("\n")
-    print(f"Loading video_ID {url} now")
+    print(f"Loading video -->> {url} now")
 
     # page loading to retrieve all comments
     comment_section = driver.find_element_by_xpath('//*[@id="comments"]')
@@ -88,8 +90,7 @@ def get_video_comments(url):
     dataf["Video_title"] = vid_title
     dataf["Video_Id"] = vid_id
 
-    filename = "YTS_" + str(vid_title)
-    dataf.to_csv(filename+".csv")
+    dataf.to_csv(current_path + "/scrapped/" + "YTS_" + str(vid_title) + ".csv")
     # return dataf
     del dataf
     del full_list
@@ -110,27 +111,4 @@ driver.close()
 
 
 
-
-# def remove_emoji(string):
-#     emoji_pattern = re.compile("["
-#                                u"\U0001F600-\U0001F64F"  # emoticons
-#                                u"\U0001F300-\U0001F5FF"  # symbols & pictographs
-#                                u"\U0001F680-\U0001F6FF"  # transport & map symbols
-#                                u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
-#                                u"\U00002500-\U00002BEF"  # chinese char
-#                                u"\U00002702-\U000027B0"
-#                                u"\U00002702-\U000027B0"
-#                                u"\U000024C2-\U0001F251"
-#                                u"\U0001f926-\U0001f937"
-#                                u"\U00010000-\U0010ffff"
-#                                u"\u2640-\u2642"
-#                                u"\u2600-\u2B55"
-#                                u"\u200d"
-#                                u"\u23cf"
-#                                u"\u23e9"
-#                                u"\u231a"
-#                                u"\ufe0f"  # dingbats
-#                                u"\u3030"
-#                                "]+", flags=re.UNICODE)
-#     return emoji_pattern.sub(r'', string)
 
